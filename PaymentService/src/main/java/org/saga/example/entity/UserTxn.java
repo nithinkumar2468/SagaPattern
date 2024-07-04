@@ -18,10 +18,8 @@ import java.util.UUID;
 public class UserTxn {
     @Id
     private UUID orderId;
-
     private int userId;
-
     private int amount;
-
     private String orderedDate;
+    private String txnState;
 }

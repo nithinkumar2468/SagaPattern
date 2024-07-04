@@ -6,7 +6,7 @@ import org.saga.example.orders.order.OrderState;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @Builder
 @ToString

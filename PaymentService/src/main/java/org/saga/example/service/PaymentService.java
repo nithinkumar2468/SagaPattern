@@ -7,6 +7,7 @@ import org.saga.example.order.model.OrderPurchase;
 import org.saga.example.orders.order.OrderResponseFromPayments;
 import org.saga.example.orders.order.OrderState;
 import org.saga.example.orders.payment.PaymentStatus;
+import org.saga.example.orders.payment.TxnState;
 import org.saga.example.orders.restaurant.PaymentResponseFromRestaurant;
 import org.saga.example.repository.PaymentRepository;
 import org.saga.example.repository.UserBalanceRepository;
@@ -69,12 +70,14 @@ public class PaymentService {
                         paymentPublisher.publish(response);
 
                         String time = new Timestamp(System.currentTimeMillis()).toString();
-                        utrepo.save(UserTxn.of(orderPurchase.getOrderId(), uba.getUserId(), orderPurchase.getPrice(), time));
+                        utrepo.save(UserTxn.of(orderPurchase.getOrderId(), uba.getUserId(), orderPurchase.getPrice(), time, TxnState.SUCCESS.toString()));
                         return true;
                     });
         } else {
             payment.setPaymentStatus(String.valueOf(PaymentStatus.FAILURE));
             repo.save(payment);
+            String time = new Timestamp(System.currentTimeMillis()).toString();
+            utrepo.save(UserTxn.of(orderPurchase.getOrderId(), ub.getUserId(), orderPurchase.getPrice(), time, TxnState.FAILURE.toString()));
             OrderResponseFromPayments response = OrderResponseFromPayments.of(orderPurchase.getOrderId(), OrderState.ORDER_FAILED);
             paymentPublisher.publish(response);
         }

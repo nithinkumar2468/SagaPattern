@@ -20,7 +20,7 @@ public class RestaurantConsumer {
     private DeliveryService service;
 
     @SqsListener("delivery-updates")
-    public void consume(Restaurant request){
+    public void consume(Restaurant request) throws InterruptedException {
         log.info("Received Order Status for orderId :" +request.getOrderId());
         service.send(request);
     }
