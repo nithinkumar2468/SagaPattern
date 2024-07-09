@@ -14,6 +14,8 @@ import org.saga.example.sqs.RestaurantPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RestaurantService {
 
@@ -57,11 +59,15 @@ public class RestaurantService {
             restaurant.setRestaurantOrderStatus("failure");
             repo.save(restaurant);
 
-            PaymentResponseFromRestaurant res = PaymentResponseFromRestaurant.of(payment.getOrderId(),payment.getPaymentId(), payment.getAmount(), OrderState.ORDER_FAILED);
+            PaymentResponseFromRestaurant res = PaymentResponseFromRestaurant.of(payment.getOrderId(), payment.getPaymentId(), payment.getAmount(), OrderState.ORDER_FAILED);
             publisher.publish(res);
 
             OrderResponseFromRestaurant response = OrderResponseFromRestaurant.of(payment.getOrderId(), OrderState.ORDER_FAILED);
             publisher.publish(response);
         }
+    }
+
+    public List<Restaurant> getAllRestaurant() {
+        return repo.findAll();
     }
 }

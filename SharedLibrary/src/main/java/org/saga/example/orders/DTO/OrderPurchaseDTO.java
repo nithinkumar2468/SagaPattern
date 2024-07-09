@@ -18,6 +18,5 @@ public class OrderPurchaseDTO {
     private Integer productId;
     private Integer hotelId;
     private Integer quantity;
-    private OrderStatus orderStatus;
     private String paymentMethod;
 }

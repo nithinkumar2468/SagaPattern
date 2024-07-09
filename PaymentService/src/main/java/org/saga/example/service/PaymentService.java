@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -52,7 +54,6 @@ public class PaymentService {
         payment.setAmount(orderPurchase.getPrice());
 
         UserBalance ub = ubrepo.findById(orderPurchase.getCustomerId()).get();
-        log.info(String.valueOf(ub));
 
         if (ub.getBalance() >= orderPurchase.getPrice()) {
             ubrepo.findById(orderPurchase.getCustomerId())
@@ -64,6 +65,7 @@ public class PaymentService {
                         paymentPublisher.publish(payment);
 
                         uba.setBalance(uba.getBalance() - orderPurchase.getPrice());
+                        log.info("Amount debited from account Id : "+uba.getUserId());
                         ubrepo.save(uba);
 
                         OrderResponseFromPayments response = OrderResponseFromPayments.of(orderPurchase.getOrderId(), OrderState.ORDER_PAID);
@@ -83,13 +85,23 @@ public class PaymentService {
         }
     }
 
-    public void update(PaymentResponseFromRestaurant response) {
+    public List<Payment> getAllPayments(){
+        return repo.findAll();
+    }
+
+    public Payment getPaymentById(@PathVariable UUID id){
+        return repo.findById(id).get();
+    }
+
+    public PaymentResponseFromRestaurant update(PaymentResponseFromRestaurant response) {
         Payment payment = repo.findById(response.getPaymentId()).get();
         payment.setPaymentStatus(String.valueOf(PaymentStatus.REFUNDED));
         repo.save(payment);
 
         UserBalance balance = ubrepo.findById(payment.getCustomerId()).get();
         balance.setBalance(balance.getBalance() + response.getAmount());
+        log.info("Amount Refunded to account Id : "+balance.getUserId());
         ubrepo.save(balance);
+        return response;
     }
 }

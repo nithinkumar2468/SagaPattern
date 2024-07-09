@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -44,4 +45,7 @@ public class DeliveryService {
         publisher.publish(response);
     }
 
+    public List<Delivery> getAllDeliveries(){
+        return repo.findAll();
+    }
 }
